@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            min-height: 100vh;
+            margin: 0;
+        }
+        .wrap{
+            margin:auto;
+        }
+        .d-flex{
+            display: flex;
+        }
+        .justify-center{
+            justify-content: center;
+        }
+        .align-center{
+            align-items: center;
+        }
+        .mt-20{
+            margin-top:20px;
+        }
+        .previewImg {
+            width: 200px;
+            margin-right:10px;
+        }
+        .input-1{
+            width:200px;
+        }
+        .hidden {
+            display: none;
+        }
+        .warning{
+            font-size:14px;
+            line-height: 14px;
+            color:rgb(117, 117, 117);
+        }
+    </style>
+</head>
+<body class="d-flex align-center justify-center">
+    <div class="wrap">
+        <div>
+            <p class="warning">*Minimum 1000x1000 boyutunda kare bir görsel seçiniz.</p>
+            <input class="input-1" type="file" data-image-selector=".carImg" />
+        </div>
+        <div class="d-flex">
+            <img class="previewImg carImg hidden mt-20" alt="medium image 1" />
+            <img class="previewImg merged-image hidden mt-20" alt="merged image" />
+            <canvas id="canvas" width="1000" height="1000" class="hidden"></canvas>
+        </div>
+        <div class="mt-20">
+            <input class="btn-merge" type="button" value="Birleştir" />
+            <img class="previewImg topBarImg hidden" alt="medium image 2" src="./topbar.png" />
+        </div>
+    </div>
+</body>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script>
+    $('.input-1').on('change', function() {
+        var reader = new FileReader(),
+        imageSelector = $(this).data('image-selector');
+        $(".warning").remove();
+
+        if (this.files && this.files[0]) {
+            reader.onload = function(e) {
+                imageIsLoaded(e, imageSelector)
+            };
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+    $('.btn-merge').on('click', merge);
+
+    function imageIsLoaded(e, imageSelector) {
+        $(imageSelector).attr('src', e.target.result);
+        $(imageSelector).removeClass('hidden');
+    };
+
+    function merge() {
+        var canvas = document.getElementById('canvas'),
+        ctx = canvas.getContext('2d'),
+        imageObj1 = new Image(),
+        imageObj2 = new Image();
+
+        imageObj1.src = $('.carImg').attr('src');
+        imageObj1.onload = function() {
+            ctx.globalAlpha = 1;
+            ctx.drawImage(imageObj1, 0, 0, 1000, 1000);
+            imageObj2.src = $('.topBarImg').attr('src');;
+            imageObj2.onload = function() {
+                ctx.globalAlpha = 1;
+                ctx.drawImage(imageObj2, 0, 0, 1000, 111);
+                var img = canvas.toDataURL('image/jpeg');
+                $('.merged-image').attr('src', img);
+                $('.merged-image').removeClass('hidden');
+            }
+        };
+    }
+</script>
+</html>
